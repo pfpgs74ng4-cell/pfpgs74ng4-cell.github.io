@@ -6,10 +6,10 @@
   <style>
     :root {
       --bg: #0d1117;
-      --panel: #161b22;
       --border: #30363d;
       --text: #f0f6fc;
       --muted: #8b949e;
+      --link: #58a6ff;
     }
 
     * { box-sizing: border-box; }
@@ -30,7 +30,7 @@
     }
 
     .container {
-      width: min(1000px, calc(100% - 40px));
+      width: min(900px, calc(100% - 40px));
       margin: 0 auto;
     }
 
@@ -51,74 +51,59 @@
       margin-left: 24px;
     }
 
-    nav a:hover {
-      color: var(--text);
-    }
+    nav a:hover { color: var(--text); }
 
-    main {
-      padding: 80px 0;
-    }
+    main { padding: 64px 0 100px; }
 
-    .hero {
-      min-height: 300px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-    }
+    section { margin-bottom: 64px; }
 
-    .hero h1 {
-      margin: 0;
-      font-size: clamp(40px, 8vw, 72px);
-      font-weight: 600;
-      letter-spacing: -2px;
-    }
-
-    .hero p {
-      margin-top: 16px;
-      color: var(--muted);
-    }
-
-    .tools {
-      margin-top: 80px;
-      padding-top: 32px;
-      border-top: 1px solid var(--border);
-    }
-
-    .tools h2 {
-      margin: 0 0 20px;
+    h2 {
+      margin: 0 0 18px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
       font-size: 22px;
     }
 
-    .tool-card {
-      display: block;
-      max-width: 320px;
-      padding: 22px;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      background: var(--panel);
-      color: var(--text);
+    ul {
+      margin: 0;
+      padding-left: 22px;
+    }
+
+    li {
+      padding: 10px 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    li a {
+      color: var(--link);
       text-decoration: none;
+      font-weight: 500;
     }
 
-    .tool-card:hover {
-      border-color: var(--muted);
-    }
+    li a:hover { text-decoration: underline; }
 
-    .tool-card strong {
+    .repo-description {
       display: block;
-      margin-bottom: 8px;
-    }
-
-    .tool-card span {
+      margin-top: 4px;
+      max-width: 760px;
       color: var(--muted);
       font-size: 14px;
     }
 
+    .repo-meta {
+      display: inline-block;
+      margin-top: 5px;
+      font-size: 12px;
+      color: #6e7681;
+    }
+
+    .status { color: var(--muted); }
+
     footer {
-      padding: 32px 0;
-      color: var(--muted);
+      padding: 28px 0;
       border-top: 1px solid var(--border);
+      color: var(--muted);
       font-size: 13px;
     }
   </style>
@@ -130,7 +115,7 @@
       <nav>
         <div class="logo">Home</div>
         <div>
-          <a href="/">Home</a>
+          <a href="#repos">Repos</a>
           <a href="#tools">Tools</a>
           <a href="https://github.com/pfpgs74ng4-cell">GitHub</a>
         </div>
@@ -139,25 +124,148 @@
   </header>
 
   <main class="container">
-    <section class="hero">
-      <div>
-        <h1>Hello.</h1>
-        <p>More things will be added here.</p>
-      </div>
+    <section id="repos">
+      <h2>Repos</h2>
+      <ul id="repo-list">
+        <li class="status">Loading public repositories...</li>
+      </ul>
     </section>
 
-    <section class="tools" id="tools">
+    <section id="tools">
       <h2>Tools</h2>
-
-      <a class="tool-card" href="/raw-bayer-viewer/">
-        <strong>RAW Bayer Viewer</strong>
-        <span>Preview Bayer RAW images in the browser →</span>
-      </a>
+      <ul>
+        <li>
+          <a href="/raw-bayer-viewer/">RAW Bayer Viewer</a>
+          — Preview Bayer RAW images in the browser
+        </li>
+      </ul>
     </section>
   </main>
 
   <footer>
     <div class="container">GitHub Pages</div>
   </footer>
+
+  <script>
+    const githubUser = "pfpgs74ng4-cell";
+    const homepageRepo = `${githubUser}.github.io`;
+    const repoList = document.getElementById("repo-list");
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function cleanMarkdown(markdown) {
+      if (!markdown) return "";
+
+      let text = markdown
+        .replace(/```[\s\S]*?```/g, " ")
+        .replace(/`([^`]+)`/g, "$1")
+        .replace(/!\[[^\]]*\]\([^)]*\)/g, " ")
+        .replace(/\[([^\]]+)\]\([^)]*\)/g, "$1")
+        .replace(/<img[^>]*>/gi, " ")
+        .replace(/<[^>]+>/g, " ")
+        .replace(/^#{1,6}\s+.*$/gm, " ")
+        .replace(/^\s*[-*_]{3,}\s*$/gm, " ")
+        .replace(/^\s*>\s?/gm, "")
+        .replace(/^\s*[-*+]\s+/gm, "")
+        .replace(/^\s*\d+\.\s+/gm, "")
+        .replace(/\*\*([^*]+)\*\*/g, "$1")
+        .replace(/__([^_]+)__/g, "$1")
+        .replace(/\*([^*]+)\*/g, "$1")
+        .replace(/_([^_]+)_/g, "$1")
+        .replace(/\r/g, "")
+        .replace(/\n{2,}/g, "\n")
+        .trim();
+
+      const lines = text
+        .split("\n")
+        .map(line => line.trim())
+        .filter(line => {
+          if (!line) return false;
+          if (/^https?:\/\//i.test(line)) return false;
+          if (/^\[!?\[.*badge/i.test(line)) return false;
+          return true;
+        });
+
+      return lines.join(" ").replace(/\s+/g, " ").trim();
+    }
+
+    function summarize(text, maxLength = 220) {
+      if (!text) return "";
+      if (text.length <= maxLength) return text;
+      return text.slice(0, maxLength).replace(/\s+\S*$/, "") + "…";
+    }
+
+    async function fetchReadmeSummary(repoName) {
+      try {
+        const response = await fetch(
+          `https://api.github.com/repos/${githubUser}/${repoName}/readme`,
+          { headers: { "Accept": "application/vnd.github.raw+json" } }
+        );
+
+        if (!response.ok) return "";
+
+        const markdown = await response.text();
+        return summarize(cleanMarkdown(markdown));
+      } catch {
+        return "";
+      }
+    }
+
+    async function loadRepos() {
+      try {
+        const response = await fetch(
+          `https://api.github.com/users/${githubUser}/repos?type=public&sort=updated&per_page=100`,
+          { headers: { "Accept": "application/vnd.github+json" } }
+        );
+
+        if (!response.ok) {
+          throw new Error(`GitHub API returned ${response.status}`);
+        }
+
+        const repos = await response.json();
+
+        const visibleRepos = repos
+          .filter(repo => !repo.fork)
+          .filter(repo => repo.name !== homepageRepo)
+          .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+
+        repoList.innerHTML = "";
+
+        if (visibleRepos.length === 0) {
+          repoList.innerHTML = '<li class="status">No public repositories yet.</li>';
+          return;
+        }
+
+        for (const repo of visibleRepos) {
+          const li = document.createElement("li");
+          const summary = await fetchReadmeSummary(repo.name);
+          const displayText = summary || repo.description || "";
+
+          li.innerHTML = `
+            <a href="${repo.html_url}" target="_blank" rel="noreferrer">
+              ${escapeHtml(repo.name)}
+            </a>
+            ${displayText ? `<span class="repo-description">${escapeHtml(displayText)}</span>` : ""}
+            ${repo.language ? `<span class="repo-meta">${escapeHtml(repo.language)}</span>` : ""}
+          `;
+
+          repoList.appendChild(li);
+        }
+      } catch (error) {
+        console.error(error);
+        repoList.innerHTML =
+          '<li class="status">Unable to load repositories from GitHub.</li>';
+      }
+    }
+
+    loadRepos();
+  </script>
 </body>
 </html>
