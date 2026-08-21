@@ -1,4 +1,3 @@
-<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -150,9 +149,9 @@
     <section class="tools" id="tools">
       <h2>Tools</h2>
 
-      <a class="tool-card" href="#">
-        <strong>Tools</strong>
-        <span>Coming soon →</span>
+      <a class="tool-card" href="/raw-bayer-viewer/">
+        <strong>RAW Bayer Viewer</strong>
+        <span>Preview Bayer RAW images in the browser →</span>
       </a>
     </section>
   </main>
